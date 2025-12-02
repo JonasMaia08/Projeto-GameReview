@@ -22,9 +22,13 @@ export default function Login() {
     }
   };
 
+  const goToRegister = () => {
+    router.push('/register');
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Game Reviews</Text>
+      <Text style={styles.title}>GameReview</Text>
       <Text style={styles.subtitle}>Faça login para continuar</Text>
 
       <TextInput
@@ -50,7 +54,12 @@ export default function Login() {
         <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
 
-      <Text style={styles.demoText}>Demo: email: demo@email.com, senha: 123456</Text>
+      <TouchableOpacity style={styles.registerButton} onPress={goToRegister}>
+        <Text style={styles.registerText}>
+          Não tem uma conta? <Text style={styles.registerBold}>Crie uma agora</Text>
+        </Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -95,10 +104,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  demoText: {
-    color: '#888',
-    textAlign: 'center',
-    marginTop: 30,
+  registerButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  registerText: {
+    color: '#aaa',
     fontSize: 14,
+  },
+  registerBold: {
+    color: '#6366f1',
+    fontWeight: 'bold',
+  },
+  demoInfo: {
+    backgroundColor: '#2d2d2d',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 30,
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  demoTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  demoText: {
+    color: '#ccc',
+    fontSize: 14,
+    marginBottom: 4,
   },
 });

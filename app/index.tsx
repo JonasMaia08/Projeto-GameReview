@@ -9,8 +9,8 @@ export default function Index() {
   }, []);
 
   const checkAuthStatus = async () => {
-    const isAuthenticated = await checkAuth();
-    
+    const { isAuthenticated } = await checkAuth();
+
     if (isAuthenticated) {
       router.replace('/home');
     } else {
@@ -21,7 +21,7 @@ export default function Index() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1a1a' }}>
       <ActivityIndicator size="large" color="#6366f1" />
-      <Text style={{ color: 'white', marginTop: 16, fontSize: 16 }}>Carregando...</Text>
+      <Text style={{ color: 'white', marginTop: 16, fontSize: 16 }}>Carregando GameReview...</Text>
     </View>
   );
 }

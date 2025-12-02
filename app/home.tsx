@@ -1,20 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { logoutUser } from '../utils/storage';
+import { logoutUser, getCurrentUser } from '../utils/storage';
 import { getAllReviews, deleteReview, Review } from '../services/database';
 import ReviewCard from '../components/ReviewCard';
 
 export default function Home() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [userName, setUserName] = useState<string>('');
 
-  // Carregar reviews quando a tela ganhar foco
   useFocusEffect(
     useCallback(() => {
+      loadUserData();
       loadReviews();
     }, [])
   );
+
+  const loadUserData = async () => {
+    const user = await getCurrentUser();
+    if (user) {
+      setUserName(user.name || user.email);
+    }
+  };
 
   const loadReviews = async () => {
     setRefreshing(true);
@@ -40,7 +48,7 @@ export default function Home() {
           onPress: async () => {
             try {
               await deleteReview(id);
-              await loadReviews(); // Recarregar após exclusão
+              await loadReviews();
             } catch (error) {
               Alert.alert('Erro', 'Não foi possível excluir a review');
             }
@@ -65,7 +73,12 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Game Reviews</Text>
+        <View>
+          <Text style={styles.title}>GameReview</Text>
+          {userName ? (
+            <Text style={styles.userName}>Olá, {userName}!</Text>
+          ) : null}
+        </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
@@ -121,12 +134,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  userName: {
+    fontSize: 14,
+    color: '#ccc',
+    marginTop: 4,
+  },
   logoutButton: {
-    padding: 8,
+    padding: 10,
+    backgroundColor: '#444',
+    borderRadius: 6,
   },
   logoutText: {
     color: '#ef4444',
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: '600',
   },
   listContent: {
     padding: 16,
