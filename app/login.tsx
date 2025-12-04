@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Platform // ADICIONAR ESTE IMPORT
+} from 'react-native';
 import { router } from 'expo-router';
 import { loginUser } from '../utils/storage';
 
@@ -28,38 +36,50 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>GameReview</Text>
-      <Text style={styles.subtitle}>Faça login para continuar</Text>
+      {/* Header com logo */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>🎮</Text>
+        <Text style={styles.appName}>GameReview</Text>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#999"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+      <View style={styles.card}>
+        <Text style={styles.title}>Acessar Conta</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor="#999"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#8b8b8b"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#8b8b8b"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-      <TouchableOpacity style={styles.registerButton} onPress={goToRegister}>
-        <Text style={styles.registerText}>
-          Não tem uma conta? <Text style={styles.registerBold}>Crie uma agora</Text>
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>▶️ ENTRAR</Text>
+        </TouchableOpacity>
 
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ou</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <TouchableOpacity style={styles.registerButton} onPress={goToRegister}>
+          <Text style={styles.registerButtonText}>CRIAR NOVA CONTA</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.footer}>Entre na maior comunidade de reviews de games</Text>
     </View>
   );
 }
@@ -67,72 +87,139 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#0a0a0a',
     padding: 20,
-    backgroundColor: '#1a1a1a',
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#ccc',
-    textAlign: 'center',
+  header: {
+    alignItems: 'center',
     marginBottom: 40,
   },
-  input: {
-    backgroundColor: '#2d2d2d',
-    color: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#6366f1',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  registerButton: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  registerText: {
-    color: '#aaa',
-    fontSize: 14,
-  },
-  registerBold: {
-    color: '#6366f1',
-    fontWeight: 'bold',
-  },
-  demoInfo: {
-    backgroundColor: '#2d2d2d',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 30,
-    borderWidth: 1,
-    borderColor: '#444',
-  },
-  demoTitle: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+  logo: {
+    fontSize: 48,
     marginBottom: 8,
   },
-  demoText: {
-    color: '#ccc',
+  appName: {
+    fontSize: 36,
+    fontWeight: '900',
+    color: '#00ff88',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  tagline: {
     fontSize: 14,
-    marginBottom: 4,
+    color: '#8b8b8b',
+    marginTop: 4,
+  },
+  card: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#ffffff',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#2a2a2a',
+    color: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#3a3a3a',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  loginButton: {
+    backgroundColor: '#00ff88',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  loginButtonText: {
+    color: '#0a0a0a',
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#3a3a3a',
+  },
+  dividerText: {
+    color: '#8b8b8b',
+    paddingHorizontal: 16,
+    fontSize: 14,
+  },
+  registerButton: {
+    backgroundColor: 'transparent',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#3a3a3a',
+  },
+  registerButtonText: {
+    color: '#00ff88',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  demoCard: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 24,
+    borderWidth: 1,
+    borderColor: '#00ff88',
+  },
+  demoTitle: {
+    color: '#00ff88',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
+  demoCredentials: {
+    gap: 4,
+  },
+  demoText: {
+    color: '#8b8b8b',
+    fontSize: 13,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  demoHighlight: {
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  footer: {
+    color: '#8b8b8b',
+    textAlign: 'center',
+    marginTop: 32,
+    fontSize: 12,
+    letterSpacing: 0.5,
   },
 });

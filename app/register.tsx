@@ -43,20 +43,20 @@ export default function Register() {
 
       if (result.success) {
         Alert.alert(
-          'Sucesso',
+          '🎉 Conta Criada!',
           result.message,
           [
             {
               text: 'OK',
-              onPress: () => router.back() // Volta para o login
+              onPress: () => router.back()
             }
           ]
         );
       } else {
-        Alert.alert('Erro', result.message);
+        Alert.alert('❌ Erro', result.message);
       }
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível realizar o cadastro');
+      Alert.alert('❌ Erro', 'Não foi possível realizar o cadastro');
     } finally {
       setLoading(false);
     }
@@ -68,75 +68,104 @@ export default function Register() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: '#0a0a0a' }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Criar Conta</Text>
-
-        <View style={styles.form}>
-          <Text style={styles.label}>Nome (opcional)</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Seu nome"
-            placeholderTextColor="#999"
-            autoCapitalize="words"
-          />
-
-          <Text style={styles.label}>Email *</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="seu@email.com"
-            placeholderTextColor="#999"
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-
-          <Text style={styles.label}>Senha *</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Mínimo 6 caracteres"
-            placeholderTextColor="#999"
-            secureTextEntry
-          />
-
-          <Text style={styles.label}>Confirmar Senha *</Text>
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Digite novamente"
-            placeholderTextColor="#999"
-            secureTextEntry
-          />
-
-          <TouchableOpacity
-            style={[styles.button, loading && styles.disabledButton]}
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? 'Criando conta...' : 'Criar Conta'}
-            </Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goToLogin} style={styles.backButton}>
+            <Text style={styles.backButtonText}>← VOLTAR</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={goToLogin}
-            disabled={loading}
-          >
-            <Text style={styles.linkText}>
-              Já tem uma conta? <Text style={styles.linkBold}>Faça login</Text>
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.appName}>GameReview</Text>
         </View>
 
+        <View style={styles.card}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>CRIAR CONTA</Text>
+            <Text style={styles.subtitle}>Junte-se à comunidade</Text>
+          </View>
+
+          <View style={styles.form}>
+            <Text style={styles.label}>NOME (OPCIONAL)</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Seu nome ou apelido"
+              placeholderTextColor="#8b8b8b"
+              autoCapitalize="words"
+            />
+
+            <Text style={styles.label}>EMAIL</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="seu@email.com"
+              placeholderTextColor="#8b8b8b"
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+
+            <Text style={styles.label}>SENHA</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Mínimo 6 caracteres"
+              placeholderTextColor="#8b8b8b"
+              secureTextEntry
+            />
+
+            <Text style={styles.label}>CONFIRMAR SENHA</Text>
+            <TextInput
+              style={styles.input}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="Digite novamente"
+              placeholderTextColor="#8b8b8b"
+              secureTextEntry
+            />
+
+            <View style={styles.requirements}>
+              <Text style={styles.requirementsTitle}>REQUISITOS:</Text>
+              <Text style={[styles.requirement, password.length >= 6 && styles.requirementMet]}>
+                • Senha com 6+ caracteres {password.length >= 6 ? '✅' : '❌'}
+              </Text>
+              <Text style={[styles.requirement, password === confirmPassword && password !== '' && styles.requirementMet]}>
+                • Senhas coincidem {password === confirmPassword && password !== '' ? '✅' : '❌'}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.registerButton, loading && styles.disabledButton]}
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              <Text style={styles.registerButtonText}>
+                {loading ? 'CRIANDO...' : '🎮 CRIAR CONTA'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.loginLink}
+              onPress={goToLogin}
+              disabled={loading}
+            >
+              <Text style={styles.loginLinkText}>
+                Já tem uma conta? <Text style={styles.loginLinkBold}>FAZER LOGIN</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.tips}>
+          <Text style={styles.tipsTitle}>💡 DICAS:</Text>
+          <Text style={styles.tip}>• Use um email válido</Text>
+          <Text style={styles.tip}>• Senha forte combina letras e números</Text>
+          <Text style={styles.tip}>• Apelidos criativos são bem-vindos!</Text>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -145,86 +174,151 @@ export default function Register() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#1a1a1a',
+    paddingTop: 60,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#ccc',
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  form: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 30,
   },
-  label: {
-    color: 'white',
+  backButton: {
+    padding: 8,
+  },
+  backButtonText: {
+    color: '#00ff88',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#00ff88',
+    letterSpacing: 1,
+  },
+  card: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  titleContainer: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#ffffff',
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  subtitle: {
     fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 6,
+    color: '#8b8b8b',
+    letterSpacing: 1,
+  },
+  form: {
+    marginBottom: 20,
+  },
+  label: {
+    color: '#00ff88',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 8,
     marginTop: 16,
+    letterSpacing: 1,
   },
   input: {
-    backgroundColor: '#2d2d2d',
-    color: 'white',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#2a2a2a',
+    color: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: '#3a3a3a',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
-  button: {
-    backgroundColor: '#6366f1',
-    padding: 15,
-    borderRadius: 10,
+  requirements: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#3a3a3a',
+  },
+  requirementsTitle: {
+    color: '#00ff88',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
+  requirement: {
+    color: '#8b8b8b',
+    fontSize: 12,
+    marginBottom: 4,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  requirementMet: {
+    color: '#00ff88',
+  },
+  registerButton: {
+    backgroundColor: '#00ff88',
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 25,
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   disabledButton: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
-  buttonText: {
-    color: 'white',
+  registerButtonText: {
+    color: '#0a0a0a',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    letterSpacing: 1,
   },
-  linkButton: {
+  loginLink: {
     marginTop: 20,
     alignItems: 'center',
   },
-  linkText: {
-    color: '#aaa',
-    fontSize: 14,
+  loginLinkText: {
+    color: '#8b8b8b',
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
-  linkBold: {
-    color: '#6366f1',
-    fontWeight: 'bold',
+  loginLinkBold: {
+    color: '#00ff88',
+    fontWeight: '700',
+    letterSpacing: 1,
   },
-  demoInfo: {
-    backgroundColor: '#2d2d2d',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
+  tips: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    padding: 20,
+    marginTop: 24,
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: '#2a2a2a',
   },
-  demoTitle: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  tipsTitle: {
+    color: '#00ff88',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 12,
+    letterSpacing: 1,
   },
-  demoText: {
-    color: '#ccc',
-    fontSize: 14,
-    marginBottom: 4,
+  tip: {
+    color: '#8b8b8b',
+    fontSize: 13,
+    marginBottom: 6,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
 });

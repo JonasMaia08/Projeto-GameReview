@@ -1,5 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  StatusBar
+} from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { logoutUser, getCurrentUser } from '../utils/storage';
 import { getAllReviews, deleteReview, Review } from '../services/database';
@@ -20,7 +28,7 @@ export default function Home() {
   const loadUserData = async () => {
     const user = await getCurrentUser();
     if (user) {
-      setUserName(user.name || user.email);
+      setUserName(user.name || user.email.split('@')[0]);
     }
   };
 
@@ -38,19 +46,19 @@ export default function Home() {
 
   const handleDeleteReview = (id: string) => {
     Alert.alert(
-      'Confirmar Exclusão',
+      'CONFIRMAR EXCLUSÃO',
       'Tem certeza que deseja excluir esta review?',
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: 'CANCELAR', style: 'cancel' },
         {
-          text: 'Excluir',
+          text: 'EXCLUIR',
           style: 'destructive',
           onPress: async () => {
             try {
               await deleteReview(id);
               await loadReviews();
             } catch (error) {
-              Alert.alert('Erro', 'Não foi possível excluir a review');
+              Alert.alert('ERRO', 'Não foi possível excluir a review');
             }
           },
         },
@@ -70,24 +78,68 @@ export default function Home() {
     router.replace('/login');
   };
 
+  const getStats = () => {
+    const totalReviews = reviews.length;
+    const avgRating = reviews.length > 0
+      ? (reviews.reduce((sum, r) => sum + r.stars, 0) / reviews.length).toFixed(1)
+      : '0.0';
+    const fiveStarReviews = reviews.filter(r => r.stars === 5).length;
+
+    return { totalReviews, avgRating, fiveStarReviews };
+  };
+
+  const stats = getStats();
+
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor="#0a0a0a" barStyle="light-content" />
+
+      {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>GameReview</Text>
-          {userName ? (
-            <Text style={styles.userName}>Olá, {userName}!</Text>
-          ) : null}
+        <View style={styles.userInfo}>
+          <Text style={styles.welcome}>👋 OLÁ,</Text>
+          <Text style={styles.userName}>{userName.toUpperCase() || 'JOGADOR'}</Text>
         </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Sair</Text>
+          <Text style={styles.logoutText}>SAIR</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Stats Card */}
+      <View style={styles.statsCard}>
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>{stats.totalReviews}</Text>
+          <Text style={styles.statLabel}>REVIEWS</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>{stats.avgRating}</Text>
+          <Text style={styles.statLabel}>MÉDIA</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>{stats.fiveStarReviews}</Text>
+          <Text style={styles.statLabel}>⭐5</Text>
+        </View>
+      </View>
+
+      {/* Title Section */}
+      <View style={styles.titleSection}>
+        <Text style={styles.sectionTitle}>MINHA BIBLIOTECA</Text>
+        <Text style={styles.sectionSubtitle}>Suas avaliações de games</Text>
       </View>
 
       {reviews.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Nenhuma review encontrada</Text>
-          <Text style={styles.emptySubtext}>Adicione sua primeira review!</Text>
+          <Text style={styles.emptyEmoji}>🎮</Text>
+          <Text style={styles.emptyTitle}>BIBLIOTECA VAZIA</Text>
+          <Text style={styles.emptyText}>Adicione sua primeira review de game!</Text>
+          <TouchableOpacity
+            style={styles.addFirstButton}
+            onPress={() => router.push('/add-review')}
+          >
+            <Text style={styles.addFirstButtonText}>+ ADICIONAR REVIEW</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -103,15 +155,19 @@ export default function Home() {
           refreshing={refreshing}
           onRefresh={loadReviews}
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
         />
       )}
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push('/add-review')}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      {/* FAB */}
+      {reviews.length > 0 && (
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => router.push('/add-review')}
+        >
+          <Text style={styles.fabIcon}>+</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -119,72 +175,164 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0a0a0a',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
     paddingTop: 60,
-    backgroundColor: '#2d2d2d',
+    paddingBottom: 20,
+    backgroundColor: '#1a1a1a',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a2a2a',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+  userInfo: {
+    flex: 1,
+  },
+  welcome: {
+    fontSize: 12,
+    color: '#8b8b8b',
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   userName: {
-    fontSize: 14,
-    color: '#ccc',
-    marginTop: 4,
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#ffffff',
+    marginTop: 2,
+    letterSpacing: 1,
   },
   logoutButton: {
-    padding: 10,
-    backgroundColor: '#444',
+    backgroundColor: '#2a2a2a',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#3a3a3a',
   },
   logoutText: {
-    color: '#ef4444',
+    color: '#ff4d4d',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  statsCard: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    margin: 20,
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#00ff88',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 10,
+    color: '#8b8b8b',
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: '#3a3a3a',
+    marginHorizontal: 10,
+  },
+  titleSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
     fontSize: 14,
-    fontWeight: '600',
+    color: '#8b8b8b',
+    letterSpacing: 0.5,
   },
   listContent: {
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyEmoji: {
+    fontSize: 64,
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#ffffff',
+    marginBottom: 8,
+    letterSpacing: 1,
   },
   emptyText: {
-    color: 'white',
-    fontSize: 18,
-    marginBottom: 8,
+    fontSize: 16,
+    color: '#8b8b8b',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
   },
-  emptySubtext: {
-    color: '#888',
+  addFirstButton: {
+    backgroundColor: '#00ff88',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 8,
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  addFirstButtonText: {
+    color: '#0a0a0a',
     fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 20,
+    bottom: 30,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#00ff88',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  fabText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
+  fabIcon: {
+    color: '#0a0a0a',
+    fontSize: 28,
+    fontWeight: '900',
   },
 });
